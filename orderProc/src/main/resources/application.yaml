@@ -1,3 +1,24 @@
+server:
+  port: 5384
+
 spring:
   application:
     name: orderProc
+
+  datasource:
+    url: jdbc:postgresql://localhost:5455/orderdb
+    username: orderuser
+    password: orderpass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+logging:
+  level:
+    org.hibernate.SQL: debug
