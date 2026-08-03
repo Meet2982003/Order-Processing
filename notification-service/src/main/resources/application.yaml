@@ -2,6 +2,17 @@ spring:
   application:
     name: notification-service
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: alexander19206r@gmail.com
+    password: zjbz mtgt brrv skco
+    properties:
+      # These must explicitly match the standard jakarta.mail property strings
+      "mail.smtp.auth": true
+      "mail.smtp.starttls.enable": true
+      "mail.smtp.starttls.required": true
+
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
