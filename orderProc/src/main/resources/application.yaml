@@ -1,6 +1,10 @@
 server:
   port: 5384
 
+jwt:
+  secret: mAdFcl+taWNe3S5W8zoQ1Fu5QrGyZHTvC6HhXFhfQGw=
+  expirationMs: 3600000
+
 spring:
   application:
     name: orderProc

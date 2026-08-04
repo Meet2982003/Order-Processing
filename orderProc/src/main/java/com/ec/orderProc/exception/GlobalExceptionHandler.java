@@ -27,6 +27,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidCredentials(InvalidCredentialException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorBody(ex.getMessage()));
+    }
+
     private Map<String, Object> errorBody(String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", Instant.now());

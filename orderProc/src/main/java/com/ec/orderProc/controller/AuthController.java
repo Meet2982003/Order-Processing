@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ec.orderProc.payload.LoginRequest;
+import com.ec.orderProc.payload.LoginResponse;
 import com.ec.orderProc.payload.RegisterRequest;
 import com.ec.orderProc.payload.RegisterResponse;
 import com.ec.orderProc.service.AuthService;
@@ -27,5 +29,10 @@ public class AuthController {
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         RegisterResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }
