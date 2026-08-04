@@ -1,4 +1,32 @@
 services:
+   order-service:
+      build:
+         context: .
+      container_name: order-service
+      ports:
+         - "5384:5384"
+      environment:
+         SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderdb
+         SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      depends_on:
+         - postgres
+         - kafka
+
+   notification-service:
+      build:
+         context: ../notification-service
+      container_name: notification-service
+      ports:
+         - "5385:5385"
+      environment:
+         SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+         SPRING_MAIL_USERNAME: alexander19206r@gmail.com
+         SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      extra_hosts:
+         - "smtp.gmail.com:142.251.179.108"
+      depends_on:
+         - kafka
    postgres:
       image: postgres:16
       container_name: order-postgres
@@ -40,6 +68,7 @@ services:
       environment:
          KAFKA_CLUSTERS_0_NAME: order-platform
          KAFKA_CLUSTERs_0_BOOTSTRAPSERVERS: kafka:29092
+
       depends_on:
          - kafka
 
