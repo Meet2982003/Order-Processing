@@ -40,4 +40,7 @@ public class Order {
     private Instant createdAt;
 
     private Instant updatedAt;
+
+    @Column(nullable = false)
+    private UUID userId;
 }

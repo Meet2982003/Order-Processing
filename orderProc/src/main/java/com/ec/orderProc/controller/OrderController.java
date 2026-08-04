@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,13 +29,16 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
-        OrderResponse response = orderService.createOrder(request);
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request,
+            Authentication authentication) {
+        UUID userId = UUID.fromString(authentication.getName());
+        OrderResponse response = orderService.createOrder(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/get-order-by-id/{id}")
-    public ResponseEntity<OrderResponse> getOrderByid(@PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.getOrder(id));
+    public ResponseEntity<OrderResponse> getOrderByid(@PathVariable UUID id, Authentication authentication) {
+        UUID userId = UUID.fromString(authentication.getName());
+        return ResponseEntity.ok(orderService.getOrder(id, userId));
     }
 }

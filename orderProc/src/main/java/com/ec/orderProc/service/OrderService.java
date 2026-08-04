@@ -26,9 +26,10 @@ public class OrderService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public OrderResponse createOrder(CreateOrderRequest request) {
+    public OrderResponse createOrder(CreateOrderRequest request, UUID userId) {
         Order order = Order.builder()
                 .id(UUID.randomUUID())
+                .userId(userId)
                 .customerEmail(request.customerEmail())
                 .totalAmount(request.totalAmount())
                 .status(OrderStatus.CREATED)
@@ -44,9 +45,13 @@ public class OrderService {
         return OrderResponse.from(saved);
     }
 
-    public OrderResponse getOrder(UUID id) {
+    public OrderResponse getOrder(UUID id, UUID requestingUserId) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException(id));
+
+        if (!order.getUserId().equals(requestingUserId)) {
+            throw new OrderNotFoundException(id);
+        }
         return OrderResponse.from(order);
     }
 
