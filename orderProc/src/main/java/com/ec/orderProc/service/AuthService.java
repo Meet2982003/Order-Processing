@@ -14,6 +14,7 @@ import com.ec.orderProc.exception.InvalidCredentialException;
 import com.ec.orderProc.exception.InvalidOtpException;
 import com.ec.orderProc.model.ResetPasswordToken;
 import com.ec.orderProc.model.User;
+import com.ec.orderProc.payload.ChangePasswordRequest;
 import com.ec.orderProc.payload.ForgotPasswordRequest;
 import com.ec.orderProc.payload.LoginRequest;
 import com.ec.orderProc.payload.LoginResponse;
@@ -121,6 +122,18 @@ public class AuthService {
 
     private String generateOtp() {
         return String.valueOf(100000 + new SecureRandom().nextInt(900000));
+    }
+
+    public void changePassword(UUID userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new InvalidCredentialException();
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
     }
 
 }
