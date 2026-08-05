@@ -21,7 +21,7 @@ services:
       environment:
          SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
          SPRING_MAIL_USERNAME: alexander19206r@gmail.com
-         SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+         SPRING_MAIL_PASSWORD: lkxb tnez ghvg iaet
 
       extra_hosts:
          - "smtp.gmail.com:142.251.179.108"

@@ -6,7 +6,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: alexander19206r@gmail.com
-    password: zjbz mtgt brrv skco
+    password: your app generated passwor
     properties:
       # These must explicitly match the standard jakarta.mail property strings
       "mail.smtp.auth": true
@@ -22,5 +22,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.use.type.headers: false
-        spring.json.value.default.type: com.ec.notification_service.event.OrderCreatedEvent
+        spring.json.use.type.headers: true
+        spring.json.type.mapping: >
+          orderCreatedEvent:com.ec.notification_service.event.OrderCreatedEvent,
+          passwordResetEvent:com.ec.notification_service.event.PasswordResetEvent

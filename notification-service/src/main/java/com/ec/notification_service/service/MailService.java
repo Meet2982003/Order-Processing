@@ -22,4 +22,14 @@ public class MailService {
     message.setText("Thanks for your order! Your orrder Id is: " + orderId);
     mailSender.send(message);
   }
+
+  @Async
+  public void sendOtpEmail(String email, String otp) {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo(email);
+    message.setSubject("Your password reset code");
+    message.setText("Your one-time password (OTP) is: " + otp +
+        "\n\nThis code is valid for 10 minutes. If you didn't request a password reset, You can safely ignore this email");
+    mailSender.send(message);
+  }
 }

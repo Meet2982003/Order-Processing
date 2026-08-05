@@ -1,0 +1,9 @@
+docker compose restart service - only stops and re-starts an existing container process without applying configuration or image updates
+
+
+docker compose up -d --build --force-recreate service -  forces Docker to recompile the Dockerfile, destroy the old container, and build a brand-new one from scratch
+
+docker compose up -d --build <service_name>
+-  You must rebuild so Docker can run npm install or pip install again inside the image pipeline. 
+ -  Note: You do not need the --force-recreate flag here; --build is smart enough to replace the container automatically when the image changes
+

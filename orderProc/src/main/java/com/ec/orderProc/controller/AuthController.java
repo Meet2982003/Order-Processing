@@ -1,5 +1,7 @@
 package com.ec.orderProc.controller;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,10 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ec.orderProc.payload.ForgotPasswordRequest;
 import com.ec.orderProc.payload.LoginRequest;
 import com.ec.orderProc.payload.LoginResponse;
 import com.ec.orderProc.payload.RegisterRequest;
 import com.ec.orderProc.payload.RegisterResponse;
+import com.ec.orderProc.payload.ResetPasswordRequest;
 import com.ec.orderProc.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -34,5 +38,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok().body(Map.of("message", "Password reset successfully"));
     }
 }
