@@ -26,9 +26,12 @@ import com.ec.orderProc.repo.ResetPasswordTokenRepository;
 import com.ec.orderProc.repo.UserRepository;
 import com.ec.orderProc.security.JwtService;
 
+import io.jsonwebtoken.Claims;
+
 @Service
 public class AuthService {
 
+    private final SessionService sessionService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -40,12 +43,13 @@ public class AuthService {
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
             ResetPasswordTokenRepository resetPasswordTokenRepository,
-            KafkaTemplate<String, PasswordResetEvent> kafkaTemplate) {
+            KafkaTemplate<String, PasswordResetEvent> kafkaTemplate, SessionService sessionService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.resetPasswordTokenRepository = resetPasswordTokenRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.sessionService = sessionService;
     }
 
     public RegisterResponse register(RegisterRequest request) {
@@ -72,6 +76,8 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(user.getId(), user.getEmail());
+        Claims claims = jwtService.parseClaims(token);
+        sessionService.registerSession(user.getId(), claims.getId(), jwtService.getExpirationMs());
         return new LoginResponse(token, user.getId(), user.getEmail());
     }
 

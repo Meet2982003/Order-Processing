@@ -23,11 +23,17 @@ public class JwtService {
         this.expirationMs = expirationMs;
     }
 
+    public long getExpirationMs() {
+        return expirationMs;
+    }
+
     public String generateToken(UUID userId, String email) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
+        String tokenId = UUID.randomUUID().toString();
 
         return Jwts.builder()
+                .id(tokenId)
                 .subject(userId.toString())
                 .claim("email", email)
                 .issuedAt(now)

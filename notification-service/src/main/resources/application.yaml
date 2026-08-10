@@ -6,7 +6,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: alexander19206r@gmail.com
-    password: your app generated passwor
+    password: zjbz mtgt brrv skco
     properties:
       # These must explicitly match the standard jakarta.mail property strings
       "mail.smtp.auth": true

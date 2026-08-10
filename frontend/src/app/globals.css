@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #101828;
+  --color-paper: #fafaf8;
+  --color-cobalt: #3654e0;
+  --color-cobalt-light: #5a73e8;
+  --color-cobalt-dark: #2740b8;
+  --color-amber: #c88719;
+  --color-shipped: #1f9d6c;
+  --color-alert: #d64545;
+
+  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cobalt);
+  outline-offset: 2px;
+}

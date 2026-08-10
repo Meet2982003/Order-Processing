@@ -1,8 +1,11 @@
 package com.ec.orderProc.security;
 
+import com.ec.orderProc.service.SessionService;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.UUID;
 
+import org.apache.kafka.common.Uuid;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -18,10 +21,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    private final SessionService sessionService;
     private final JwtService jwtService;
 
-    public JwtAuthFilter(JwtService jwtService) {
+    public JwtAuthFilter(JwtService jwtService, SessionService sessionService) {
         this.jwtService = jwtService;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -35,6 +40,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtService.parseClaims(token);
                 String userId = claims.getSubject();
+                String tokenId = claims.getId();
+
+                if (!sessionService.isActiveSession(UUID.fromString(userId), tokenId)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null,
                         Collections.emptyList());
