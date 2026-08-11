@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import "leaflet/dist/leaflet.css";
 @theme {
   --color-ink: #101828;
   --color-paper: #fafaf8;
@@ -22,4 +22,55 @@
 :focus-visible {
   outline: 2px solid var(--color-cobalt);
   outline-offset: 2px;
+}
+
+@keyframes truck-drive {
+  0%,
+  8% {
+    left: 2%;
+  }
+  25% {
+    left: 26%;
+  }
+  50% {
+    left: 50%;
+  }
+  75% {
+    left: 74%;
+  }
+  92%,
+  100% {
+    left: 96%;
+  }
+}
+@keyframes road-scroll {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -80px;
+  }
+}
+
+@keyframes truck-bounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(-1deg);
+  }
+}
+@keyframes truck-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-truck-bounce {
+  animation: truck-bounce 1.4s ease-in-out infinite;
 }

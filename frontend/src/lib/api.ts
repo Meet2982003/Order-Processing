@@ -1,7 +1,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5384";
 
 export async function apiFetch(path: string, options: RequestInit = {}){
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
 
     const res = await fetch(`${API_BASE_URL}${path}`,{
         ...options,

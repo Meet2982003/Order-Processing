@@ -1,4 +1,8 @@
+"use client";
+
 import { LayoutDashboard, Link, Package, PlusCircle, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const navItem = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -12,6 +16,25 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      router.replace("/login");
+    } else {
+      setChecked(true);
+    }
+  }, [router]);
+
+  function handleLogout() {
+    sessionStorage.removeItem("token");
+    router.push("/login");
+  }
+
+  if (!checked) return null;
+
   return (
     <div className="flex min-h-screen">
       <aside className="w-64 shrink-0 bg-ink text-paper flex flex-col">
@@ -38,7 +61,10 @@ export default function DashboardLayout({
           <span className="font-mono text-sm text-ink/50">
             Order Processing Platform
           </span>
-          <button className="text-sm font-medium text-ink/80 hover:text-alert transition-colors">
+          <button
+            onClick={handleLogout}
+            className="text-sm font-medium text-ink/80 hover:text-alert transition-colors"
+          >
             Log out
           </button>
         </header>
