@@ -113,6 +113,31 @@ interface OrderJourneyMapProps {
   onReady?: () => void;
 }
 
+function MapSizeFixer() {
+  const map = useMap();
+
+  useEffect(() => {
+    // fire once immediately after mount, after the browser has painted
+    const raf = requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+
+    // and keep watching the actual container element in case layout
+    // settles even later (fonts, responsive breakpoints, etc.)
+    const container = map.getContainer();
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    observer.observe(container);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
+  }, [map]);
+
+  return null;
+}
 export default function OrderJourneyMap({
   route,
   zoom,
@@ -194,6 +219,7 @@ export default function OrderJourneyMap({
 
         <Marker position={pos} icon={icon} />
         <MapPanner pos={pos} />
+        <MapSizeFixer />
       </MapContainer>
     </div>
   );

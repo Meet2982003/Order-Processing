@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -63,8 +64,13 @@ public class AuthService {
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .createdAt(Instant.now())
                 .build();
-        User saved = userRepository.save(user);
-        return new RegisterResponse(saved.getId(), saved.getEmail());
+
+        try {
+            User saved = userRepository.save(user);
+            return new RegisterResponse(saved.getId(), saved.getEmail());
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyExistsException(request.email());
+        }
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -140,6 +146,10 @@ public class AuthService {
 
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
+    }
+
+    public void logout(UUID userId) {
+        sessionService.clearSession(userId);
     }
 
 }

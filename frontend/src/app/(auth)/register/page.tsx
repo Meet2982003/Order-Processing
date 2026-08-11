@@ -28,6 +28,8 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
+
+    // console.log(error);
   }
 
   return (

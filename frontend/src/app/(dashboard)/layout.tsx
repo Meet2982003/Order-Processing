@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/api";
 import { LayoutDashboard, Link, Package, PlusCircle, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -28,9 +29,14 @@ export default function DashboardLayout({
     }
   }, [router]);
 
-  function handleLogout() {
-    sessionStorage.removeItem("token");
-    router.push("/login");
+  async function handleLogout() {
+    try {
+      await apiFetch("/auth/logout", { method: "POST" });
+    } catch {
+    } finally {
+      sessionStorage.removeItem("token");
+      router.push("/login");
+    }
   }
 
   if (!checked) return null;

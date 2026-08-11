@@ -13,9 +13,15 @@ export async function apiFetch(path: string, options: RequestInit = {}){
     });
 
     if(!res.ok){
+
+        console.log(res.text);
+        
+
         const error = await res.json().catch(() => ({message: "Something went wrong" }));
         throw new Error(error.message || "Request failed")
     }
+    console.log(res);
+    
 
     return res.status === 204 ? null : res.json();
 }

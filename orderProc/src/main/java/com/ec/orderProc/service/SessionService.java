@@ -27,4 +27,7 @@ public class SessionService {
         return tokenId.equals(activeTokenId);
     }
 
+    public void clearSession(UUID userId) {
+        redisTemplate.delete("active_session:" + userId);
+    }
 }
