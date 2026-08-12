@@ -41,3 +41,7 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+
+geocoding:
+  nominating-url: https://nominatim.openstreetmap.org
+  user-agent: "OrderOpsPlatform/1.0 (learning project; contact: alexander19206r@gmail.com)"
