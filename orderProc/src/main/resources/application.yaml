@@ -2,7 +2,7 @@ server:
   port: 5384
 
 jwt:
-  secret: mAdFcl+taWNe3S5W8zoQ1Fu5QrGyZHTvC6HhXFhfQGw=
+  secret: mAdFcl+taWNe3S5W8zoQ1Fu5QrGyZHTvC6HhXFhfQGw
   expirationMs: 3600000
 
 spring:
@@ -41,6 +41,8 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+    org.springframework.security: trace       
+    org.springframework.security.web: trace   
 
 geocoding:
   nominating-url: https://nominatim.openstreetmap.org

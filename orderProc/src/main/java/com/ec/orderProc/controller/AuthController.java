@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ec.orderProc.payload.ChangePasswordRequest;
 import com.ec.orderProc.payload.ForgotPasswordRequest;
 import com.ec.orderProc.payload.LoginRequest;
 import com.ec.orderProc.payload.LoginResponse;
@@ -59,5 +60,14 @@ public class AuthController {
         UUID userId = UUID.fromString(authentication.getName());
         authService.logout(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            Authentication authentication) {
+        UUID userId = UUID.fromString(authentication.getName());
+        authService.changePassword(userId, request);
+        return ResponseEntity.ok().body(Map.of("message", "Password changed successfully"));
     }
 }

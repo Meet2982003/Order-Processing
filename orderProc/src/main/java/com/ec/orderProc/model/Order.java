@@ -44,21 +44,15 @@ public class Order {
     @Column(nullable = false)
     private UUID userId;
 
-    @Column(nullable = false)
     private Double pickupLat;
 
-    @Column(nullable = false)
     private Double pickupLng;
 
-    @Column(nullable = false)
     private String pickupCity;
 
-    @Column(nullable = false)
     private String deliveryAddress;
 
-    @Column(nullable = false)
     private Double deliveryLat;
 
-    @Column(nullable = false)
     private Double deliveryLng;
 }

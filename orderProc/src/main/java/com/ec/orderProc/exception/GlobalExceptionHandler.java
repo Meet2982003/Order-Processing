@@ -44,6 +44,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorBody(ex.getMessage()));
     }
 
+    @ExceptionHandler(GeocodingException.class)
+    public ResponseEntity<Map<String, Object>> handleGeocoding(GeocodingException ex) {
+        String descriptiveMessage = "Unable to find locations for address: " + ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(descriptiveMessage));
+    }
+
     private Map<String, Object> errorBody(String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", Instant.now());

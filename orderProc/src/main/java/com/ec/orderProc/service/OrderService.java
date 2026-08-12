@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.ec.orderProc.exception.OrderNotFoundException;
@@ -34,9 +35,6 @@ public class OrderService {
     }
 
     public OrderResponse createOrder(CreateOrderRequest request, UUID userId) {
-
-        GeocodingService.Coordinates delivery = geocodingService.geocode(request.deliveryAddress());
-        Warehouse warehouse = warehouseService.findNearest(delivery.lat(), delivery.lng());
         Order order = Order.builder()
                 .id(UUID.randomUUID())
                 .userId(userId)
@@ -44,11 +42,6 @@ public class OrderService {
                 .totalAmount(request.totalAmount())
                 .status(OrderStatus.CREATED)
                 .deliveryAddress(request.deliveryAddress())
-                .deliveryLat(delivery.lat())
-                .deliveryLng(delivery.lng())
-                .pickupCity(warehouse.getCity())
-                .pickupLat(warehouse.getLat())
-                .pickupLng(warehouse.getLng())
                 .createdAt(Instant.now())
                 .build();
 
@@ -58,7 +51,28 @@ public class OrderService {
                 saved.getId(), saved.getCustomerEmail(), saved.getTotalAmount(), saved.getCreatedAt());
         kafkaTemplate.send(TOPIC, saved.getId().toString(), event);
 
+        resolveOrderLocation(saved.getId(), request.deliveryAddress()); // fire-and-forget
+
         return OrderResponse.from(saved);
+    }
+
+    @Async
+    public void resolveOrderLocation(UUID orderId, String deliveryAddress) {
+        try {
+            GeocodingService.Coordinates delivery = geocodingService.geocode(deliveryAddress);
+            Warehouse warehouse = warehouseService.findNearest(delivery.lat(), delivery.lng());
+
+            Order order = orderRepository.findById(orderId).orElseThrow();
+            order.setDeliveryLat(delivery.lat());
+            order.setDeliveryLng(delivery.lng());
+            order.setPickupLat(warehouse.getLat());
+            order.setPickupLng(warehouse.getLng());
+            order.setPickupCity(warehouse.getCity());
+            orderRepository.save(order);
+        } catch (Exception e) {
+            System.out
+                    .println("[OrderService] Failed to resolve location for order " + orderId + ": " + e.getMessage());
+        }
     }
 
     public OrderResponse getOrder(UUID id, UUID requestingUserId) {
