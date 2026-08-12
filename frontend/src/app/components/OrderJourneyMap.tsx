@@ -10,7 +10,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { LatLng } from "../lib/random-route";
+import type { LatLng } from "../../lib/random-route";
 import { useEffect } from "react";
 import { buildCumulativeDistances } from "@/lib/random-route";
 

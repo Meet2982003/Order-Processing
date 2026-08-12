@@ -1,6 +1,7 @@
 package com.ec.orderProc.service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.kafka.core.KafkaTemplate;
@@ -53,6 +54,12 @@ public class OrderService {
             throw new OrderNotFoundException(id);
         }
         return OrderResponse.from(order);
+    }
+
+    public List<OrderResponse> getOrdersForUser(UUID userId) {
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream().map(OrderResponse::from)
+                .toList();
     }
 
 }

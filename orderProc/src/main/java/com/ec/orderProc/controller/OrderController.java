@@ -1,5 +1,6 @@
 package com.ec.orderProc.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,12 @@ public class OrderController {
         UUID userId = UUID.fromString(authentication.getName());
         OrderResponse response = orderService.createOrder(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/for-user")
+    public ResponseEntity<List<OrderResponse>> getOrders(Authentication authentication) {
+        UUID userId = UUID.fromString(authentication.getName());
+        return ResponseEntity.ok(orderService.getOrdersForUser(userId));
     }
 
     @GetMapping("/get-order-by-id/{id}")

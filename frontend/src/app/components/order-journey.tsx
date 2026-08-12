@@ -14,9 +14,17 @@ interface OrderJourneyProps {
   className?: string;
 }
 
-const TRAVEL_MS = 26000; // slower drive
-const PAUSE_MS = 2800; // hold at delivery
-const START_DELAY_MS = 4500; // wait after map is actually visible, before truck moves
+const TRAVEL_MS = 26000;
+const PAUSE_MS = 2800;
+const START_DELAY_MS = 4500;
+
+// maps a real order status to a fixed point along the route (0 = pickup, 1 = delivered)
+const STATUS_PROGRESS: Record<string, number> = {
+  CREATED: 0,
+  PAID: 0.15,
+  SHIPPED: 0.55,
+  DELIVERED: 1,
+};
 
 type Phase = "loading" | "waiting" | "traveling" | "paused";
 
@@ -31,9 +39,9 @@ export function OrderJourney({
   const [phase, setPhase] = useState<Phase>("loading");
   const [mapReady, setMapReady] = useState(false);
 
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(null);
   const travelStartRef = useRef<number>(0);
-  const waitTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const waitTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const loadRoute = useCallback(async () => {
     const { route, zoom } = await generateRandomRoute();
@@ -41,20 +49,50 @@ export function OrderJourney({
     setZoom(zoom);
   }, []);
 
-  // initial route load
+  // ---- REAL MODE: cancelled orders don't get a route at all ----
+  if (!demo && status === "CANCELLED") {
+    return (
+      <div className="h-48 sm:h-56 lg:h-72 rounded-2xl bg-ink border border-paper/10 flex flex-col items-center justify-center gap-2">
+        <span className="text-alert font-mono text-xs tracking-wide">
+          STATUS: CANCELLED
+        </span>
+        <span className="text-paper/40 text-xs">
+          This order will not be delivered
+        </span>
+      </div>
+    );
+  }
+
+  // ---- REAL MODE: load a route once, then just sit at the point matching status ----
+  useEffect(() => {
+    if (demo || route) return;
+    let cancelled = false;
+    loadRoute().then(() => {
+      if (!cancelled) setPhase("loading");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [demo, route, loadRoute]);
+
+  useEffect(() => {
+    if (demo) return;
+    const target = status ? (STATUS_PROGRESS[status] ?? 0) : 0;
+    setProgress(target);
+  }, [demo, status]);
+
+  // ---- DEMO MODE: unchanged from before ----
   useEffect(() => {
     if (!demo) return;
     let cancelled = false;
     loadRoute().then(() => {
-      if (!cancelled) setPhase("loading"); // stays "loading" until mapReady fires too
+      if (!cancelled) setPhase("loading");
     });
     return () => {
       cancelled = true;
     };
   }, [demo, loadRoute]);
 
-  // once BOTH the route exists and Leaflet has actually painted tiles,
-  // wait a fixed grace period before the truck starts moving
   useEffect(() => {
     if (!demo || !route || !mapReady) return;
     if (phase !== "loading") return;
@@ -68,12 +106,9 @@ export function OrderJourney({
     return () => {
       if (waitTimeoutRef.current) clearTimeout(waitTimeoutRef.current);
     };
-    // intentionally omitting `phase` — including it causes this effect to
-    // re-run (and cancel its own timeout) the moment it calls setPhase("waiting")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [demo, route, mapReady]);
 
-  // travel animation
   useEffect(() => {
     if (!demo || phase !== "traveling" || !route) return;
 
@@ -96,8 +131,6 @@ export function OrderJourney({
     };
   }, [demo, phase, route]);
 
-  // pause -> fetch a NEW route in the background -> reset to loading state
-  // (which re-triggers the mapReady + start-delay flow above for the new city)
   useEffect(() => {
     if (!demo || phase !== "paused") return;
 
@@ -113,11 +146,11 @@ export function OrderJourney({
 
       setTimeout(() => {
         if (cancelled) return;
-        setMapReady(false); // new city's tiles need to load fresh
+        setMapReady(false);
         setProgress(0);
         setRoute(nextRoute);
         setZoom(nextZoom);
-        setPhase("loading"); // re-enters loading -> waiting -> traveling flow
+        setPhase("loading");
       }, remaining);
     };
 
@@ -127,18 +160,17 @@ export function OrderJourney({
     };
   }, [demo, phase]);
 
-  const currentLabel =
-    phase === "loading" || phase === "waiting"
+  const currentLabel = demo
+    ? phase === "loading" || phase === "waiting"
       ? "Preparing"
       : phase === "paused"
         ? "Delivered"
-        : "In transit";
+        : "In transit"
+    : (status ?? "Unknown");
 
-  if (!demo) {
-    return null; // unchanged — wire up real status-driven mode as before
-  }
-
-  const showSkeleton = phase === "loading" || !route || !mapReady;
+  const showSkeleton = demo
+    ? phase === "loading" || !route || !mapReady
+    : !route || !mapReady;
 
   return (
     <div className={`relative ${className ?? ""}`}>
