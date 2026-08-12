@@ -10,7 +10,7 @@ export default function AccountPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setMessage("");
@@ -33,47 +33,52 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="max-w-lg">
-      <h1 className="font-display text-2xl font-bold text-ink mb-6">Account</h1>
+    <div className="max-w-lg mx-auto py-10">
+      {/* <h1 className="font-display text-2xl font-bold text-ink mb-6">Account</h1> */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-2xl border border-ink/10 p-6 space-y-4"
+        className="bg-white rounded-2xl border border-ink/10 p-6"
       >
-        <p className="text-sm font-semibold text-ink">Change password</p>
-        <div>
-          <label className="block text-sm font-medium text-ink mb-1.5">
-            Current password
-          </label>
-          <input
-            type="password"
-            required
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full rounded-lg border border-ink/15 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-transparent"
-          />
+        <h2 className="text-lg font-semibold text-ink mb-5">Change password</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-ink mb-1.5">
+              Current password
+            </label>
+            <input
+              type="password"
+              required
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="w-full rounded-lg border border-ink/15 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-ink mb-1.5">
+              New password
+            </label>
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full rounded-lg border border-ink/15 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-transparent"
+            />
+          </div>
+
+          {error && <p className="text-sm text-alert">{error}</p>}
+          {message && <p className="text-sm text-shipped">{message}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded-lg bg-gradient-to-r from-cobalt to-cobalt-dark text-white text-sm font-semibold px-5 py-2.5 shadow-md shadow-cobalt/25 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
+          >
+            {loading ? "Updating…" : "Update password"}
+          </button>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-ink mb-1.5">
-            New password
-          </label>
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full rounded-lg border border-ink/15 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-transparent"
-          />
-        </div>
-        {error && <p className="text-sm text-alert">{error}</p>}
-        {message && <p className="text-sm text-shipped">{message}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-lg bg-gradient-to-r from-cobalt to-cobalt-dark text-white text-sm font-semibold px-5 py-2.5 shadow-md shadow-cobalt/25 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
-        >
-          {loading ? "Updating…" : "Update password"}
-        </button>
       </form>
     </div>
   );
