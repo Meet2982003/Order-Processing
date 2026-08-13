@@ -22,15 +22,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // 1. Consider defining a proper CorsConfigurationSource if frontend is blocked
                 .cors(cors -> {
                 })
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Always allow HTTP OPTIONS for browser pre-flight requests first
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/register", "/auth/login", "/auth/forgot-password", "/error",
-                                "/auth/reset-password")
+
+                        // Permit authentication endpoints
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/forgot-password",
+                                "/auth/reset-password", "/error")
                         .permitAll()
+
+                        // Product endpoints authorization rules
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
+
+                        // Catch-all rule must ALWAYS come last
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

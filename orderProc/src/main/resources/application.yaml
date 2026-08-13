@@ -47,3 +47,7 @@ logging:
 geocoding:
   nominating-url: https://nominatim.openstreetmap.org
   user-agent: "OrderOpsPlatform/1.0 (learning project; contact: alexander19206r@gmail.com)"
+
+admin:
+  email: mradmin123@gmail.com
+  password: MrAdmin@123

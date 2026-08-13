@@ -8,9 +8,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.ec.orderProc.enums.OrderStatus;
 import com.ec.orderProc.exception.OrderNotFoundException;
 import com.ec.orderProc.model.Order;
-import com.ec.orderProc.model.OrderStatus;
 import com.ec.orderProc.model.Warehouse;
 import com.ec.orderProc.payload.CreateOrderRequest;
 import com.ec.orderProc.payload.OrderCreatedEvent;

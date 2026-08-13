@@ -10,6 +10,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ec.orderProc.enums.Role;
 import com.ec.orderProc.exception.EmailAlreadyExistsException;
 import com.ec.orderProc.exception.InvalidCredentialException;
 import com.ec.orderProc.exception.InvalidOtpException;
@@ -62,6 +63,7 @@ public class AuthService {
                 .id(UUID.randomUUID())
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .role(Role.USER)
                 .createdAt(Instant.now())
                 .build();
 

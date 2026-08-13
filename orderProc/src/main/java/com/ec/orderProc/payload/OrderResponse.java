@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.ec.orderProc.model.Order;
-import com.ec.orderProc.model.OrderStatus;
+import com.ec.orderProc.enums.OrderStatus;
 
 public record OrderResponse(
         UUID id,

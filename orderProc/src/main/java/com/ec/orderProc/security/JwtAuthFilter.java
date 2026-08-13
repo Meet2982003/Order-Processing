@@ -3,10 +3,12 @@ package com.ec.orderProc.security;
 import com.ec.orderProc.service.SessionService;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.kafka.common.Uuid;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -40,6 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtService.parseClaims(token);
                 String userId = claims.getSubject();
+                String role = claims.get("role", String.class);
                 String tokenId = claims.getId();
 
                 if (!sessionService.isActiveSession(UUID.fromString(userId), tokenId)) {
@@ -48,7 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null,
-                        Collections.emptyList());
+                        List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 

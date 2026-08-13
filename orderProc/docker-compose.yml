@@ -8,6 +8,7 @@ services:
       environment:
          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderdb
          SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+
       depends_on:
          - postgres
          - kafka

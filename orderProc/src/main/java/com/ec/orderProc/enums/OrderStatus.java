@@ -1,4 +1,4 @@
-package com.ec.orderProc.model;
+package com.ec.orderProc.enums;
 
 public enum OrderStatus {
     CREATED,
