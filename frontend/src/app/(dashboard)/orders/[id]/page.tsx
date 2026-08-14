@@ -50,7 +50,11 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="bg-ink rounded-2xl overflow-hidden">
-        <OrderJourney status={order.status} />
+        <OrderJourney
+          status={order.status}
+          pickup={[order.pickupLat, order.pickupLng!]}
+          delivery={[order.deliveryLat, order.deliveryLng!]}
+        />
       </div>
 
       <div className="bg-white rounded-2xl border border-ink/10 p-6 grid grid-cols-2 gap-6">

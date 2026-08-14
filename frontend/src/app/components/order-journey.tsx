@@ -1,6 +1,10 @@
 "use client";
 
-import { generateRandomRoute, LatLng } from "@/lib/random-route";
+import {
+  generateRandomRoute,
+  getRouteBetween,
+  LatLng,
+} from "@/lib/random-route";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useCallback } from "react";
 
@@ -11,6 +15,8 @@ const OrderJourneyMap = dynamic(() => import("./OrderJourneyMap"), {
 interface OrderJourneyProps {
   status?: string;
   demo?: boolean;
+  pickup?: LatLng;
+  delivery?: LatLng;
   className?: string;
 }
 
@@ -31,6 +37,8 @@ type Phase = "loading" | "waiting" | "traveling" | "paused";
 export function OrderJourney({
   status,
   demo = false,
+  pickup,
+  delivery,
   className,
 }: OrderJourneyProps) {
   const [route, setRoute] = useState<LatLng[] | null>(null);
@@ -65,15 +73,15 @@ export function OrderJourney({
 
   // ---- REAL MODE: load a route once, then just sit at the point matching status ----
   useEffect(() => {
-    if (demo || route) return;
+    if (demo || route || !pickup || !delivery) return;
     let cancelled = false;
-    loadRoute().then(() => {
-      if (!cancelled) setPhase("loading");
+    getRouteBetween(pickup, delivery).then((r) => {
+      if (!cancelled) setRoute(r);
     });
     return () => {
       cancelled = true;
     };
-  }, [demo, route, loadRoute]);
+  }, [demo, route, pickup, delivery]);
 
   useEffect(() => {
     if (demo) return;

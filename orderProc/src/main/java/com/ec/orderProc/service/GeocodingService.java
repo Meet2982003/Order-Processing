@@ -25,10 +25,10 @@ public class GeocodingService {
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${geocoding.api.url:https://nominatim.openstreetmap.org}")
+    @Value("${geocoding.nominating-url:https://nominatim.openstreetmap.org}")
     private String nominatingUrl;
 
-    @Value("${geocoding.user-agent:OrderProcessingApp/1.0}")
+    @Value("${geocoding.user-agent}")
     private String userAgent;
 
     public GeocodingService(RestTemplate restTemplate, ObjectMapper objectMapper, StringRedisTemplate redisTemplate) {
@@ -52,7 +52,11 @@ public class GeocodingService {
         Coordinates result = geocodeUncached(address);
         System.out.println("[Geocoding] Took " + (System.currentTimeMillis() - start) + "ms for: " + address);
 
-        redisTemplate.opsForValue().set(cacheKey, result.lat() + "," + result.lng(), Duration.ofDays(30));
+        boolean isFallback = result.lat() == 28.6139 && result.lng() == 77.2090;
+        if (!isFallback) {
+            redisTemplate.opsForValue().set(cacheKey, result.lat() + "," + result.lng(), Duration.ofDays(30));
+        }
+
         return result;
     }
 
@@ -84,7 +88,7 @@ public class GeocodingService {
         } catch (GeocodingException e) {
             /* continue */ }
 
-        // --- LAYER 4: City Extractor ---
+        // --- LAYER 4: City Extractor (comma-based) ---
         String[] parts = address.split(",");
         if (parts.length >= 2) {
             String broadArea = parts[parts.length - 2].trim() + ", " + parts[parts.length - 1].trim();
@@ -94,6 +98,15 @@ public class GeocodingService {
                 /* continue */ }
         }
 
+        // --- LAYER 4b: City Extractor (space-based, for comma-less addresses) ---
+        String[] words = address.trim().split("\\s+");
+        if (words.length >= 2) {
+            String lastTwoWords = words[words.length - 2] + " " + words[words.length - 1];
+            try {
+                return executeQuery(lastTwoWords);
+            } catch (GeocodingException e) {
+                /* continue */ }
+        }
         // --- LAYER 5: ULTIMATE FALLBACK SAFETY NET ---
         System.out.println("[Geocoding] API failed for address. Applying default safety coordinates.");
 
@@ -104,6 +117,14 @@ public class GeocodingService {
         }
 
         return new Coordinates(28.6139, 77.2090);
+    }
+
+    private void sleep() {
+        try {
+            Thread.sleep(1100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private Coordinates executeQuery(String queryText) {
@@ -119,28 +140,34 @@ public class GeocodingService {
         headers.set(HttpHeaders.USER_AGENT, userAgent);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-            JsonNode results = objectMapper.readTree(response.getBody());
+        int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+                JsonNode results = objectMapper.readTree(response.getBody());
 
-            if (!results.isArray() || results.isEmpty()) {
-                System.out.println(
-                        "[Geocoding] Empty results for query: " + queryText + " | raw response: " + response.getBody());
-                throw new GeocodingException(queryText);
+                if (!results.isArray() || results.isEmpty()) {
+                    throw new GeocodingException(queryText);
+                }
+
+                JsonNode first = results.get(0);
+                return new Coordinates(first.get("lat").asDouble(), first.get("lon").asDouble());
+
+            } catch (GeocodingException ge) {
+                throw ge; // genuine "no results" - retrying won't help, fail fast
+            } catch (Exception e) {
+                System.out.println("[Geocoding] Attempt " + attempt + "/" + maxAttempts + " failed for '"
+                        + queryText + "': " + e.getClass().getSimpleName());
+                if (attempt == maxAttempts) {
+                    throw new GeocodingException(queryText);
+                }
+                try {
+                    Thread.sleep(1000L * attempt); // 1s, then 2s backoff
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
             }
-
-            JsonNode first = results.get(0);
-            double lat = first.get("lat").asDouble();
-            double lng = first.get("lon").asDouble();
-            return new Coordinates(lat, lng);
-
-        } catch (GeocodingException ge) {
-            throw ge;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("[Geocoding] executeQuery failed for '" + queryText + "': "
-                    + e.getClass().getSimpleName() + " - " + e.getMessage());
-            throw new GeocodingException(queryText);
         }
+        throw new GeocodingException(queryText); // unreachable, satisfies compiler
     }
 }

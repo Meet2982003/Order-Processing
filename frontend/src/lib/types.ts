@@ -13,3 +13,26 @@ export interface Order {
   pickupLng: number | null;
   pickupCity: string | null;
 }
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+}
+
+export interface CartItemType {
+  id: string;
+  productId: string;
+  productName: string;
+  price: number;
+  quantity: number;
+}
+
+export interface Cart {
+  id: string;
+  items: CartItemType[];
+  total: number;
+}

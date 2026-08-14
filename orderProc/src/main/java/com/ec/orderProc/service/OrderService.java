@@ -20,11 +20,13 @@ import com.ec.orderProc.model.Carts;
 import com.ec.orderProc.model.Order;
 import com.ec.orderProc.model.OrderItem;
 import com.ec.orderProc.model.Products;
+import com.ec.orderProc.model.User;
 import com.ec.orderProc.model.Warehouse;
 import com.ec.orderProc.payload.CreateOrderRequest;
 import com.ec.orderProc.payload.OrderCreatedEvent;
 import com.ec.orderProc.payload.OrderResponse;
 import com.ec.orderProc.repo.OrderRepository;
+import com.ec.orderProc.repo.UserRepository;
 
 @Service
 public class OrderService {
@@ -35,17 +37,19 @@ public class OrderService {
     private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
     private final GeocodingService geocodingService;
     private final WarehouseService warehouseService;
+    private final UserRepository userRepository;
     private final CartService cartService;
 
     public OrderService(OrderRepository orderRepository, KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate,
             GeocodingService geocodingService, WarehouseService warehouseService, CartService cartService,
-            CartRepository cartRepository) {
+            CartRepository cartRepository, UserRepository userRepository) {
         this.orderRepository = orderRepository;
         this.kafkaTemplate = kafkaTemplate;
         this.geocodingService = geocodingService;
         this.warehouseService = warehouseService;
         this.cartService = cartService;
         this.cartRepository = cartRepository;
+        this.userRepository = userRepository;
     }
 
     public OrderResponse createOrder(CreateOrderRequest request, UUID userId) {
@@ -54,6 +58,9 @@ public class OrderService {
         if (cart.getItems().isEmpty()) {
             throw new EmptyCartException();
         }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         BigDecimal total = BigDecimal.ZERO;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -82,7 +89,7 @@ public class OrderService {
         Order order = Order.builder()
                 .id(UUID.randomUUID())
                 .userId(userId)
-                .customerEmail(request.customerEmail())
+                .customerEmail(user.getEmail())
                 .totalAmount(total)
                 .status(OrderStatus.CREATED)
                 .deliveryAddress(request.deliveryAddress())

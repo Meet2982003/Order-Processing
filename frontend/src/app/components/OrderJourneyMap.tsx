@@ -84,6 +84,17 @@ function stopIcon(icon: string, color: string) {
   });
 }
 
+function MapBoundsFitter({ route }: { route: LatLng[] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const bounds = L.latLngBounds(route);
+    map.fitBounds(bounds, { padding: [40, 40] });
+  }, [route, map]);
+
+  return null;
+}
+
 function labelIcon(text: string, color: string) {
   return L.divIcon({
     className: "",

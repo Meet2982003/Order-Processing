@@ -10,12 +10,15 @@ import {
   User,
   PanelLeftClose,
   PanelLeftOpen,
+  ShoppingBag,
 } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
-  { href: "/orders", label: "Orders", icon: Package },
-  { href: "/orders/new", label: "New Order", icon: PlusCircle },
+  { href: "/products", label: "Products", icon: Package },
+  { href: "/cart", label: "Cart", icon: ShoppingBag },
+  { href: "/orders", label: "Orders", icon: PlusCircle },
+  { href: "/account", label: "Account", icon: User },
 ];
 
 export default function DashboardLayout({

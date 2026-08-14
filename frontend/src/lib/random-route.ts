@@ -6,6 +6,10 @@ function randomInRange(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 
+export async function getRouteBetween(pickup: LatLng, delivery: LatLng): Promise<LatLng[]> {
+  const route = await fetchRoadRoute(pickup, delivery);
+  return route ?? [pickup, delivery]; // straight-line fallback if OSRM fails
+}
 async function snapToRoad(lat: number, lng: number): Promise<LatLng | null> {
   try {
     const res = await fetch(`${OSRM}/nearest/v1/driving/${lng},${lat}?number=1`);
