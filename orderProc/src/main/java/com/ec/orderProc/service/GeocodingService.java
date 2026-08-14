@@ -65,7 +65,8 @@ public class GeocodingService {
         try {
             return executeQuery(address);
         } catch (GeocodingException e) {
-            /* continue */ }
+            sleep();
+        }
 
         // --- LAYER 2: PIN Code Extraction (e.g., "India 201301") ---
         Pattern pinPattern = Pattern.compile("\\b\\d{6}\\b");
@@ -75,7 +76,8 @@ public class GeocodingService {
             try {
                 return executeQuery("India " + pincode);
             } catch (GeocodingException e) {
-                /* continue */ }
+                sleep();
+            }
         }
 
         // --- LAYER 3: Cleaned Address Layout ---
@@ -86,7 +88,8 @@ public class GeocodingService {
         try {
             return executeQuery(cleanAddress);
         } catch (GeocodingException e) {
-            /* continue */ }
+            sleep();
+        }
 
         // --- LAYER 4: City Extractor (comma-based) ---
         String[] parts = address.split(",");
@@ -95,7 +98,8 @@ public class GeocodingService {
             try {
                 return executeQuery(broadArea);
             } catch (GeocodingException e) {
-                /* continue */ }
+                sleep();
+            }
         }
 
         // --- LAYER 4b: City Extractor (space-based, for comma-less addresses) ---
@@ -105,7 +109,8 @@ public class GeocodingService {
             try {
                 return executeQuery(lastTwoWords);
             } catch (GeocodingException e) {
-                /* continue */ }
+                sleep();
+            }
         }
         // --- LAYER 5: ULTIMATE FALLBACK SAFETY NET ---
         System.out.println("[Geocoding] API failed for address. Applying default safety coordinates.");
@@ -128,9 +133,8 @@ public class GeocodingService {
     }
 
     private Coordinates executeQuery(String queryText) {
-        URI uri = UriComponentsBuilder.fromUriString(nominatingUrl + "/search")
+        URI uri = UriComponentsBuilder.fromUriString(nominatingUrl + "/api")
                 .queryParam("q", queryText)
-                .queryParam("format", "json")
                 .queryParam("limit", 1)
                 .build()
                 .encode()
@@ -144,14 +148,15 @@ public class GeocodingService {
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
                 ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-                JsonNode results = objectMapper.readTree(response.getBody());
+                JsonNode root = objectMapper.readTree(response.getBody());
+                JsonNode features = root.path("features");
 
-                if (!results.isArray() || results.isEmpty()) {
+                if (features.isMissingNode() || !features.isArray() || features.isEmpty()) {
                     throw new GeocodingException(queryText);
                 }
 
-                JsonNode first = results.get(0);
-                return new Coordinates(first.get("lat").asDouble(), first.get("lon").asDouble());
+                JsonNode coordinates = features.get(0).path("geometry").path("coordinates");
+                return new Coordinates(coordinates.get(1).asDouble(), coordinates.get(0).asDouble());
 
             } catch (GeocodingException ge) {
                 throw ge; // genuine "no results" - retrying won't help, fail fast
