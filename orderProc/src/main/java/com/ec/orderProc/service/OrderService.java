@@ -1,6 +1,9 @@
 package com.ec.orderProc.service;
 
+import com.ec.orderProc.repo.CartRepository;
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,8 +12,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.ec.orderProc.enums.OrderStatus;
+import com.ec.orderProc.exception.EmptyCartException;
+import com.ec.orderProc.exception.InsufficientStockException;
 import com.ec.orderProc.exception.OrderNotFoundException;
+import com.ec.orderProc.model.CartItem;
+import com.ec.orderProc.model.Carts;
 import com.ec.orderProc.model.Order;
+import com.ec.orderProc.model.OrderItem;
+import com.ec.orderProc.model.Products;
 import com.ec.orderProc.model.Warehouse;
 import com.ec.orderProc.payload.CreateOrderRequest;
 import com.ec.orderProc.payload.OrderCreatedEvent;
@@ -20,38 +29,79 @@ import com.ec.orderProc.repo.OrderRepository;
 @Service
 public class OrderService {
 
+    private final CartRepository cartRepository;
     private static final String TOPIC = "order.created";
     private final OrderRepository orderRepository;
     private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
     private final GeocodingService geocodingService;
     private final WarehouseService warehouseService;
+    private final CartService cartService;
 
     public OrderService(OrderRepository orderRepository, KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate,
-            GeocodingService geocodingService, WarehouseService warehouseService) {
+            GeocodingService geocodingService, WarehouseService warehouseService, CartService cartService,
+            CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.kafkaTemplate = kafkaTemplate;
         this.geocodingService = geocodingService;
         this.warehouseService = warehouseService;
+        this.cartService = cartService;
+        this.cartRepository = cartRepository;
     }
 
     public OrderResponse createOrder(CreateOrderRequest request, UUID userId) {
+        Carts cart = cartService.getOrCreateCart(userId);
+
+        if (cart.getItems().isEmpty()) {
+            throw new EmptyCartException();
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        for (CartItem cartItem : cart.getItems()) {
+            Products product = cartItem.getProduct();
+
+            if (cartItem.getQuantity() > product.getStock()) {
+                throw new InsufficientStockException(product.getName(), product.getStock());
+            }
+
+            BigDecimal lineTotal = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+            total = total.add(lineTotal);
+
+            orderItems.add(OrderItem.builder()
+                    .id(UUID.randomUUID())
+                    .product(product)
+                    .productName(product.getName())
+                    .priceAtPurchase(product.getPrice())
+                    .quantity(cartItem.getQuantity())
+                    .build());
+
+            product.setStock(product.getStock() - cartItem.getQuantity());
+        }
+
         Order order = Order.builder()
                 .id(UUID.randomUUID())
                 .userId(userId)
                 .customerEmail(request.customerEmail())
-                .totalAmount(request.totalAmount())
+                .totalAmount(total)
                 .status(OrderStatus.CREATED)
                 .deliveryAddress(request.deliveryAddress())
                 .createdAt(Instant.now())
                 .build();
 
+        orderItems.forEach(item -> item.setOrder(order));
+        order.setItems(orderItems);
+
         Order saved = orderRepository.save(order);
+
+        cart.getItems().clear();
+        cartRepository.save(cart);
 
         OrderCreatedEvent event = new OrderCreatedEvent(
                 saved.getId(), saved.getCustomerEmail(), saved.getTotalAmount(), saved.getCreatedAt());
         kafkaTemplate.send(TOPIC, saved.getId().toString(), event);
 
-        resolveOrderLocation(saved.getId(), request.deliveryAddress()); // fire-and-forget
+        resolveOrderLocation(saved.getId(), request.deliveryAddress());
 
         return OrderResponse.from(saved);
     }

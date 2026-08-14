@@ -83,7 +83,8 @@ public class AuthService {
             throw new InvalidCredentialException();
         }
 
-        String token = jwtService.generateToken(user.getId(), user.getEmail());
+        Role role = user.getRole();
+        String token = jwtService.generateToken(user.getId(), user.getEmail(), role);
         Claims claims = jwtService.parseClaims(token);
         sessionService.registerSession(user.getId(), claims.getId(), jwtService.getExpirationMs());
         return new LoginResponse(token, user.getId(), user.getEmail());

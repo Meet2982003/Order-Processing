@@ -8,6 +8,8 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.ec.orderProc.enums.Role;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,7 +29,7 @@ public class JwtService {
         return expirationMs;
     }
 
-    public String generateToken(UUID userId, String email) {
+    public String generateToken(UUID userId, String email, Role role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
         String tokenId = UUID.randomUUID().toString();
@@ -36,6 +38,7 @@ public class JwtService {
                 .id(tokenId)
                 .subject(userId.toString())
                 .claim("email", email)
+                .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(signingKey)

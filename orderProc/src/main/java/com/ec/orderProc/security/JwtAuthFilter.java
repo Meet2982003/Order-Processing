@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.kafka.common.Uuid;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,20 +45,32 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String tokenId = claims.getId();
 
                 if (!sessionService.isActiveSession(UUID.fromString(userId), tokenId)) {
+                    // Stop further processing if session is inactive
                     filterChain.doFilter(request, response);
                     return;
                 }
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+                List<SimpleGrantedAuthority> authorities;
+                if (role != null && !role.isBlank()) {
+                    String finalRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                    authorities = List.of(new SimpleGrantedAuthority(finalRole));
+                } else {
+                    authorities = Collections.emptyList();
+                }
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userId, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
             } catch (JwtException e) {
-
+                // Change: Clear security context if token manipulation or expiration occurs
+                SecurityContextHolder.clearContext();
+                // Optional: You can send a 401 error directly here if preferred:
+                // response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
+                // return;
             }
         }
         filterChain.doFilter(request, response);
     }
-
 }
