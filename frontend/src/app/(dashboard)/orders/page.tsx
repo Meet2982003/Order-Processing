@@ -23,15 +23,7 @@ export default function OrderPage() {
 
   return (
     <div>
-      <div className="flex item-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold text-ink">Orders</h1>
-        <Link
-          href="/orders/new"
-          className="rounded-lg bg-cobalt text-white text-sm font-semifold px-4 py-2 shadow-md shadow-cobalt/25 hover:shadow-lg hover:-translate-y-0.5 transition-all"
-        >
-          New Order
-        </Link>
-      </div>
+      <h1 className="font-display text-2xl font-bold text-ink mb-6">Orders</h1>
       {loading && <p className="text-sm text-ink/50">Loading orders…</p>}
       {error && <p className="text-sm text-alert">{error}</p>}
 
@@ -42,10 +34,10 @@ export default function OrderPage() {
           </div>
           <p className="text-sm text-ink/50 mb-4">No orders yet</p>
           <Link
-            href="/orders/new"
+            href="/products"
             className="text-sm font-medium text-cobalt hover:underline"
           >
-            Create your first order
+            Browse products
           </Link>
         </div>
       )}

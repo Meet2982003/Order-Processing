@@ -18,7 +18,7 @@ const navItems = [
   { href: "/products", label: "Products", icon: Package },
   { href: "/cart", label: "Cart", icon: ShoppingBag },
   { href: "/orders", label: "Orders", icon: PlusCircle },
-  { href: "/account", label: "Account", icon: User },
+  // { href: "/account", label: "Account", icon: User },
 ];
 
 export default function DashboardLayout({
@@ -47,15 +47,13 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen">
       <aside
-        className={`shrink-0 bg-ink text-paper flex flex-col transition-all duration-500 ease-in-out overflow-hidden ${
-          sidebarOpen ? "w-64" : "w-16"
-        }`}
+        className={`shrink-0 bg-ink text-paper flex flex-col transition-all duration-500 ease-in-out overflow-hidden ${sidebarOpen ? "w-64" : "w-16"
+          }`}
       >
         <div className="px-4 py-5 border-b border-white/10 flex items-center justify-between">
           <span
-            className={`font-display font-bold text-lg tracking-tight whitespace-nowrap overflow-hidden transition-all duration-300 ${
-              sidebarOpen ? "opacity-100 max-w-[160px]" : "opacity-0 max-w-0"
-            }`}
+            className={`font-display font-bold text-lg tracking-tight whitespace-nowrap overflow-hidden transition-all duration-300 ${sidebarOpen ? "opacity-100 max-w-[160px]" : "opacity-0 max-w-0"
+              }`}
           >
             Order Ops
           </span>
@@ -80,19 +78,17 @@ export default function DashboardLayout({
                 key={item.href}
                 href={item.href}
                 title={!sidebarOpen ? item.label : undefined}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  active
-                    ? "bg-cobalt/20 text-white"
-                    : "text-paper/70 hover:bg-white/5 hover:text-paper"
-                }`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${active
+                  ? "bg-cobalt/20 text-white"
+                  : "text-paper/70 hover:bg-white/5 hover:text-paper"
+                  }`}
               >
                 <item.icon size={18} className="shrink-0" />
                 <span
-                  className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${
-                    sidebarOpen
-                      ? "opacity-100 max-w-[160px]"
-                      : "opacity-0 max-w-0"
-                  }`}
+                  className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${sidebarOpen
+                    ? "opacity-100 max-w-[160px]"
+                    : "opacity-0 max-w-0"
+                    }`}
                 >
                   {item.label}
                 </span>
@@ -105,17 +101,15 @@ export default function DashboardLayout({
           <Link
             href="/account"
             title={!sidebarOpen ? "Account" : undefined}
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-              pathname === "/account"
-                ? "bg-cobalt/20 text-white"
-                : "text-paper/70 hover:bg-white/5 hover:text-paper"
-            }`}
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${pathname === "/account"
+              ? "bg-cobalt/20 text-white"
+              : "text-paper/70 hover:bg-white/5 hover:text-paper"
+              }`}
           >
             <User size={18} className="shrink-0" />
             <span
-              className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${
-                sidebarOpen ? "opacity-100 max-w-[160px]" : "opacity-0 max-w-0"
-              }`}
+              className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${sidebarOpen ? "opacity-100 max-w-[160px]" : "opacity-0 max-w-0"
+                }`}
             >
               Account
             </span>

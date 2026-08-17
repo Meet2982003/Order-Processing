@@ -194,9 +194,9 @@ export default function OrderJourneyMap({
       <MapContainer
         center={center}
         zoom={zoom}
-        scrollWheelZoom={false}
-        zoomControl={false}
-        dragging={false}
+        scrollWheelZoom={true}
+        zoomControl={true}
+        dragging={true}
         style={{ height: "100%", width: "100%", background: "#0f0f14" }}
       >
         <TileLayer
