@@ -83,7 +83,7 @@ export default function CartPage() {
                     {item.productName}
                   </p>
                   <p className="text-xs text-ink/40 font-mono">
-                    ${item.price.toFixed(2)} each
+                    ₹{item.price.toFixed(2)} each
                   </p>
                 </div>
                 <input
@@ -96,7 +96,7 @@ export default function CartPage() {
                   className="w-16 rounded-lg border border-ink/15 px-2 py-1.5 text-sm text-center"
                 />
                 <span className="text-sm font-semibold text-ink w-20 text-right">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ₹{(item.price * item.quantity).toFixed(2)}
                 </span>
                 <button
                   onClick={() => removeItem(item.id)}
@@ -111,7 +111,7 @@ export default function CartPage() {
           <div className="flex items-center justify-between mb-6 px-1">
             <span className="text-sm font-medium text-ink/60">Total</span>
             <span className="text-xl font-bold text-ink">
-              ${cart.total.toFixed(2)}
+              ₹{cart.total.toFixed(2)}
             </span>
           </div>
 
@@ -140,7 +140,7 @@ export default function CartPage() {
             >
               {checkingOut
                 ? "Placing order…"
-                : `Checkout — $${cart.total.toFixed(2)}`}
+                : `Checkout — ₹${cart.total.toFixed(2)}`}
             </button>
           </form>
         </>

@@ -52,8 +52,8 @@ export default function OrderDetailPage() {
       <div className="bg-ink rounded-2xl overflow-hidden">
         <OrderJourney
           status={order.status}
-          pickup={[order.pickupLat, order.pickupLng!]}
-          delivery={[order.deliveryLat, order.deliveryLng!]}
+          pickup={[order.pickupLat!, order.pickupLng!]}
+          delivery={[order.deliveryLat!, order.deliveryLng!]}
         />
       </div>
 
@@ -63,7 +63,7 @@ export default function OrderDetailPage() {
             Total amount
           </p>
           <p className="text-lg font-semibold text-ink">
-            ${order.totalAmount.toFixed(2)}
+            ₹{order.totalAmount.toFixed(2)}
           </p>
         </div>
         <div>

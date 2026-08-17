@@ -13,6 +13,8 @@ import com.ec.orderProc.payload.AccountResponse;
 import com.ec.orderProc.payload.UpdateAccountRequest;
 import com.ec.orderProc.repo.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AccountService {
 
@@ -40,6 +42,7 @@ public class AccountService {
         return AccountResponse.from(updatedUser);
     }
 
+    @Transactional
     public void uploadProfilePicture(UUID userId, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new InvalidFileTypeException();

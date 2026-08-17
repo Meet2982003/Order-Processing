@@ -48,8 +48,7 @@ public class User {
     @Column
     private String phoneNumber;
 
-    @Lob
-    @Column
+    @Column(columnDefinition = "bytea")
     private byte[] profilePicture;
 
     @Column
