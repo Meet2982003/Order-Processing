@@ -143,7 +143,7 @@ export default function OverviewPage() {
           <div className="bg-white border border-ink/10 rounded-[1.5rem] p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group cursor-default">
             <div className="absolute -right-4 -top-4 w-24 h-24 bg-shipped/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
             <div className="flex items-center justify-between mb-4 relative">
-               <p className="text-xs font-bold text-ink/50 uppercase tracking-wider">Total Revenue</p>
+               <p className="text-xs font-bold text-ink/50 uppercase tracking-wider">Total Spending</p>
                <div className="w-10 h-10 rounded-full bg-shipped/10 text-shipped flex items-center justify-center group-hover:scale-110 transition-transform">
                   <TrendingUp size={20} />
                </div>

@@ -122,6 +122,7 @@ interface OrderJourneyMapProps {
   progress: number;
   /** fires once Leaflet has actually painted tiles, so the parent can fade this in */
   onReady?: () => void;
+  mapClassName?: string;
 }
 
 function MapSizeFixer() {
@@ -154,6 +155,7 @@ export default function OrderJourneyMap({
   zoom,
   progress,
   onReady,
+  mapClassName,
 }: OrderJourneyMapProps) {
   const [tilesLoaded, setTilesLoaded] = useState(false);
 
@@ -187,7 +189,7 @@ export default function OrderJourneyMap({
 
   return (
     <div
-      className={`relative h-48 sm:h-56 lg:h-72 rounded-2xl overflow-hidden border border-paper/10 transition-opacity duration-500 ${
+      className={`relative ${mapClassName || "h-48 sm:h-56 lg:h-72"} rounded-2xl overflow-hidden border border-paper/10 transition-opacity duration-500 ${
         tilesLoaded ? "opacity-100" : "opacity-0"
       }`}
     >

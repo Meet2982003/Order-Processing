@@ -18,6 +18,7 @@ interface OrderJourneyProps {
   pickup?: LatLng;
   delivery?: LatLng;
   className?: string;
+  mapClassName?: string;
 }
 
 const TRAVEL_MS = 26000;
@@ -40,6 +41,7 @@ export function OrderJourney({
   pickup,
   delivery,
   className,
+  mapClassName,
 }: OrderJourneyProps) {
   const [route, setRoute] = useState<LatLng[] | null>(null);
   const [zoom, setZoom] = useState(13);
@@ -60,7 +62,7 @@ export function OrderJourney({
   // ---- REAL MODE: cancelled orders don't get a route at all ----
   if (!demo && status === "CANCELLED") {
     return (
-      <div className="h-48 sm:h-56 lg:h-72 rounded-2xl bg-ink border border-paper/10 flex flex-col items-center justify-center gap-2">
+      <div className={`${mapClassName || "h-48 sm:h-56 lg:h-72"} rounded-2xl bg-ink border border-paper/10 flex flex-col items-center justify-center gap-2`}>
         <span className="text-alert font-mono text-xs tracking-wide">
           STATUS: CANCELLED
         </span>
@@ -189,7 +191,7 @@ export function OrderJourney({
       )}
 
       {showSkeleton && (
-        <div className="h-48 sm:h-56 lg:h-72 rounded-2xl bg-ink border border-paper/10 flex items-center justify-center">
+        <div className={`${mapClassName || "h-48 sm:h-56 lg:h-72"} rounded-2xl bg-ink border border-paper/10 flex items-center justify-center`}>
           <span className="text-paper/40 text-xs font-mono animate-pulse">
             plotting route…
           </span>
@@ -197,12 +199,13 @@ export function OrderJourney({
       )}
 
       {route && (
-        <div className={showSkeleton ? "hidden" : ""}>
+        <div className={showSkeleton ? "hidden" : "h-full w-full"}>
           <OrderJourneyMap
             route={route}
             zoom={zoom}
             progress={progress}
             onReady={() => setMapReady(true)}
+            mapClassName={mapClassName}
           />
         </div>
       )}
