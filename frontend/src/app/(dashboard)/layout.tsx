@@ -12,6 +12,7 @@ import {
   PanelLeftOpen,
   ShoppingBag,
 } from "lucide-react";
+import AnimatedHeaderTitle from "@/app/components/AnimatedHeaderTitle";
 
 const navItems = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -118,10 +119,8 @@ export default function DashboardLayout({
       </aside>
 
       <div className="flex-1 flex flex-col">
-        <header className="h-16 border-b border-ink/10 flex items-center justify-between px-6">
-          <span className="font-mono text-sm text-ink/50">
-            Order Processing Platform
-          </span>
+        <header className="h-16 border-b border-ink/10 flex items-center justify-between px-6 bg-white z-10 relative shadow-sm">
+          <AnimatedHeaderTitle />
           <button
             onClick={handleLogout}
             className="text-sm font-medium text-ink/80 hover:text-alert transition-colors"

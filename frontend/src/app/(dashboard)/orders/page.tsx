@@ -53,7 +53,7 @@ export default function OrderPage() {
           <p className="text-sm text-ink/50 mb-8 max-w-sm">Looks like you haven't placed any orders. Browse our products to get started.</p>
           <Link
             href="/products"
-            className="inline-flex items-center justify-center rounded-xl bg-cobalt text-white font-semibold px-6 py-3 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+            className="inline-flex items-center justify-center rounded-xl bg-ink text-white font-semibold px-6 py-3 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
           >
             Browse Products
           </Link>

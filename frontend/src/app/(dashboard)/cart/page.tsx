@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import type { Cart } from "@/lib/types";
-import { Trash2, ShoppingBag } from "lucide-react";
+import { Trash2, ShoppingBag, ShoppingCart } from "lucide-react";
+import Link from "next/link";
 
 export default function CartPage() {
   const router = useRouter();
@@ -67,11 +68,40 @@ export default function CartPage() {
       <h1 className="font-display text-2xl font-bold text-ink mb-6">Cart</h1>
 
       {isEmpty ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-12 h-12 rounded-full bg-ink/5 flex items-center justify-center mb-3">
-            <ShoppingBag size={20} className="text-ink/40" />
-          </div>
-          <p className="text-sm text-ink/50">Your cart is empty</p>
+        <div className="flex flex-col items-center justify-center py-24 text-center overflow-hidden bg-white rounded-[2rem] border border-ink/10 shadow-sm relative w-full">
+           {/* Animated Track/Road */}
+           <div className="absolute bottom-[40%] w-full border-b-2 border-dashed border-ink/5"></div>
+           
+           {/* Running Trolley */}
+           <div className="relative mb-8 w-full flex justify-center">
+              <div className="animate-[cartRun_4s_linear_infinite] flex items-center relative z-10">
+                 {/* Speed lines */}
+                 <div className="absolute right-full mr-3 flex flex-col gap-1.5 opacity-40">
+                    <div className="h-0.5 w-6 bg-ink/30 rounded-full animate-[wind_0.5s_linear_infinite]"></div>
+                    <div className="h-0.5 w-4 bg-ink/30 rounded-full animate-[wind_0.5s_linear_infinite_0.2s]"></div>
+                 </div>
+                 <ShoppingCart size={56} className="text-ink/30 transform -rotate-12 animate-truck-bounce" strokeWidth={1.5} />
+              </div>
+           </div>
+           
+           <h3 className="text-2xl font-display font-bold text-ink mb-2 z-10">Your cart is empty</h3>
+           <p className="text-sm text-ink/50 mb-8 z-10">Looks like you haven't added anything yet.</p>
+           
+           <Link href="/products" className="inline-flex items-center justify-center rounded-xl bg-ink text-white font-semibold px-6 py-3 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all z-10">
+              Start Shopping
+           </Link>
+
+           <style dangerouslySetInnerHTML={{__html: `
+             @keyframes cartRun {
+               0% { transform: translateX(-50vw); }
+               100% { transform: translateX(50vw); }
+             }
+             @keyframes wind {
+               0% { transform: translateX(10px); opacity: 0; }
+               50% { opacity: 1; }
+               100% { transform: translateX(-10px); opacity: 0; }
+             }
+           `}} />
         </div>
       ) : (
         <>
@@ -136,7 +166,7 @@ export default function CartPage() {
             <button
               type="submit"
               disabled={checkingOut}
-              className="w-full rounded-lg bg-gradient-to-r from-cobalt to-cobalt-dark text-white text-sm font-semibold py-2.5 shadow-md shadow-cobalt/25 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              className="w-full rounded-lg bg-ink text-white text-sm font-semibold py-2.5 shadow-md shadow-ink/25 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
             >
               {checkingOut
                 ? "Placing order…"

@@ -120,7 +120,7 @@ export default function OverviewPage() {
           <p className="text-ink/60 text-sm mt-1">Get a bird's-eye view of your account activity.</p>
         </div>
         <div className="flex items-center gap-3">
-           <Link href="/products" className="inline-flex items-center justify-center rounded-xl bg-cobalt text-white font-semibold px-5 py-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm">
+           <Link href="/products" className="inline-flex items-center justify-center rounded-xl bg-ink text-white font-semibold px-5 py-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm">
              Browse Products
            </Link>
         </div>

@@ -203,7 +203,7 @@ useEffect(() => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-cobalt text-white flex items-center justify-center shadow-lg hover:bg-cobalt-dark transition-all disabled:opacity-50 hover:scale-110 z-10"
+              className="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-ink text-white flex items-center justify-center shadow-lg hover:bg-ink/90 transition-all disabled:opacity-50 hover:scale-110 z-10"
               title="Update profile picture"
             >
               {uploading ? (
@@ -335,7 +335,7 @@ useEffect(() => {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded-xl bg-cobalt text-white font-semibold px-5 py-3 shadow-md shadow-cobalt/25 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-ink text-white font-semibold px-5 py-3 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save Changes"}
             </button>
@@ -379,7 +379,7 @@ useEffect(() => {
             <button
               type="submit"
               disabled={pwLoading}
-              className="flex-1 rounded-xl bg-cobalt text-white font-semibold px-5 py-3 shadow-md shadow-cobalt/25 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-ink text-white font-semibold px-5 py-3 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
             >
               {pwLoading ? "Updating…" : "Update Password"}
             </button>
