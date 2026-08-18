@@ -91,7 +91,7 @@ public class OrderService {
                 .userId(userId)
                 .customerEmail(user.getEmail())
                 .totalAmount(total)
-                .status(OrderStatus.CREATED)
+                .status(OrderStatus.PENDING_PAYMENT)
                 .deliveryAddress(request.deliveryAddress())
                 .createdAt(Instant.now())
                 .build();
@@ -103,12 +103,6 @@ public class OrderService {
 
         cart.getItems().clear();
         cartRepository.save(cart);
-
-        OrderCreatedEvent event = new OrderCreatedEvent(
-                saved.getId(), saved.getCustomerEmail(), saved.getTotalAmount(), saved.getCreatedAt());
-        kafkaTemplate.send(TOPIC, saved.getId().toString(), event);
-
-        resolveOrderLocation(saved.getId(), request.deliveryAddress());
 
         return OrderResponse.from(saved);
     }
@@ -148,4 +142,7 @@ public class OrderService {
                 .toList();
     }
 
+    public Order getOrderEntity(UUID id) {
+        return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
+    }
 }

@@ -27,7 +27,7 @@ const START_DELAY_MS = 4500;
 
 // maps a real order status to a fixed point along the route (0 = pickup, 1 = delivered)
 const STATUS_PROGRESS: Record<string, number> = {
-  CREATED: 0,
+  PENDING_PAYMENT: 0,
   PAID: 0.15,
   SHIPPED: 0.55,
   DELIVERED: 1,
@@ -68,6 +68,20 @@ export function OrderJourney({
         </span>
         <span className="text-paper/40 text-xs">
           This order will not be delivered
+        </span>
+      </div>
+    );
+  }
+
+  // ---- REAL MODE: handle missing coordinates (e.g. pending payment) ----
+  if (!demo && (!pickup || !delivery || pickup[0] == null || delivery[0] == null)) {
+    return (
+      <div className={`${mapClassName || "h-48 sm:h-56 lg:h-72"} rounded-2xl bg-ink border border-paper/10 flex flex-col items-center justify-center gap-2`}>
+        <span className="text-cobalt font-mono text-xs tracking-wide">
+          STATUS: {status || "PENDING"}
+        </span>
+        <span className="text-paper/40 text-xs text-center px-4">
+          Location data will be available after payment is confirmed
         </span>
       </div>
     );

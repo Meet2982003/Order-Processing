@@ -1,8 +1,9 @@
 package com.ec.orderProc.enums;
 
 public enum OrderStatus {
-    CREATED,
+    PENDING_PAYMENT,
     PAID,
+    PAYMENT_FAILED,
     SHIPPED,
     DELIVERED,
     CANCELLED

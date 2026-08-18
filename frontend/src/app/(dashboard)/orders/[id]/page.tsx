@@ -137,7 +137,25 @@ export default function OrderDetailPage() {
              </p>
           </div>
           
-          <div className="pt-4 border-t border-ink/5 flex items-center justify-between">
+          <div className="mb-6 space-y-3">
+             <h4 className="text-sm font-bold text-ink/60 uppercase tracking-wider">Order Items</h4>
+             <div className="divide-y divide-ink/5 border-t border-ink/5">
+                {order.items?.map((item) => (
+                   <div key={item.productId} className="py-3 flex justify-between items-center">
+                      <div className="flex flex-col">
+                         <span className="text-sm font-semibold text-ink">{item.productName}</span>
+                         <span className="text-xs text-ink/50">Qty: {item.quantity} × ₹{item.priceAtPurchase.toFixed(2)}</span>
+                      </div>
+                      <span className="text-sm font-bold text-ink">₹{(item.quantity * item.priceAtPurchase).toFixed(2)}</span>
+                   </div>
+                ))}
+                {(!order.items || order.items.length === 0) && (
+                   <div className="py-3 text-sm text-ink/50 italic">No items details available</div>
+                )}
+             </div>
+          </div>
+          
+          <div className="pt-4 border-t border-ink/5 flex items-center justify-between mt-auto">
              <span className="text-xs font-bold text-ink/60 uppercase tracking-wider">Invoice Ref</span>
              <span className="font-mono text-xs text-ink/40">INV-{order.id.slice(0, 10).toUpperCase()}</span>
           </div>

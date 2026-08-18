@@ -1,5 +1,4 @@
-export type OrderStatus = "CREATED" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELLED";
-
+export type OrderStatus = "PENDING_PAYMENT" | "PAID" | "PAYMENT_FAILED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 export interface Order {
   id: string;
   customerEmail: string;
@@ -12,6 +11,12 @@ export interface Order {
   pickupLat: number | null;
   pickupLng: number | null;
   pickupCity: string | null;
+  items: {
+    productId: string;
+    productName: string;
+    priceAtPurchase: number;
+    quantity: number;
+  }[];
 }
 
 export interface Product {

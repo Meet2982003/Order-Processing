@@ -12,6 +12,7 @@ export default function ProductsPage() {
   const [addingId, setAddingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
     apiFetch("/products")
@@ -25,7 +26,7 @@ export default function ProductsPage() {
     try {
       await apiFetch("/cart/items", {
         method: "POST",
-        body: JSON.stringify({ productId, quantity: 1 }),
+        body: JSON.stringify({ productId, quantity: quantities[productId] || 1 }),
       });
       setSuccessId(productId);
       setTimeout(() => setSuccessId(null), 2000);
@@ -106,10 +107,31 @@ export default function ProductsPage() {
                         ₹{product.price.toFixed(2)}
                       </span>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex flex-col items-end gap-2">
                       <span className={`text-xs font-semibold px-2 py-1 rounded-md ${isOut ? 'bg-alert/10 text-alert' : 'bg-shipped/10 text-shipped'}`}>
                         {isOut ? 'Out of stock' : `${product.stock} in stock`}
                       </span>
+                      {!isOut && (
+                        <div className="flex items-center border border-ink/10 rounded-lg overflow-hidden">
+                          <button
+                            disabled={isAdding || isSuccess}
+                            onClick={() => setQuantities(prev => ({ ...prev, [product.id]: Math.max(1, (prev[product.id] || 1) - 1) }))}
+                            className="px-2 py-1 bg-paper hover:bg-ink/5 text-ink/60 transition-colors"
+                          >
+                            -
+                          </button>
+                          <span className="px-3 py-1 text-sm font-semibold min-w-[2rem] text-center">
+                            {quantities[product.id] || 1}
+                          </span>
+                          <button
+                            disabled={isAdding || isSuccess || (quantities[product.id] || 1) >= product.stock}
+                            onClick={() => setQuantities(prev => ({ ...prev, [product.id]: Math.min(product.stock, (prev[product.id] || 1) + 1) }))}
+                            className="px-2 py-1 bg-paper hover:bg-ink/5 text-ink/60 transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   

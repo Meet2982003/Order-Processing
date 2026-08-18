@@ -6,7 +6,6 @@ jwt:
   expirationMs: 3600000
 
 spring:
-
   data:
     redis:
       host: redis
@@ -41,8 +40,8 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
-    org.springframework.security: trace       
-    org.springframework.security.web: trace   
+    org.springframework.security: trace
+    org.springframework.security.web: trace
 
 geocoding:
   nominating-url: https://photon.komoot.io
@@ -51,3 +50,8 @@ geocoding:
 admin:
   email: mradmin123@gmail.com
   password: MrAdmin@123
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  success-url: http://localhost:3000/checkout/success
+  cancel-url: http://localhost:3000/checkout/cancel

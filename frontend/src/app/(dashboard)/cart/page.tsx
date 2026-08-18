@@ -47,11 +47,15 @@ export default function CartPage() {
     setError("");
     setCheckingOut(true);
     try {
-      const order = await apiFetch("/orders/create", {
+      const data = await apiFetch("/orders/create", {
         method: "POST",
         body: JSON.stringify({ deliveryAddress: address }),
       });
-      router.push(`/orders/${order.id}`);
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        router.push(`/orders/${data.orderId || data.id}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Checkout failed");
     } finally {
@@ -64,7 +68,7 @@ export default function CartPage() {
   const isEmpty = !cart || cart.items.length === 0;
 
   return (
-    <div className="max-w-2xl">
+    <div className="w-full max-w-5xl mx-auto pb-12">
       <h1 className="font-display text-2xl font-bold text-ink mb-6">Cart</h1>
 
       {isEmpty ? (
@@ -104,76 +108,118 @@ export default function CartPage() {
            `}} />
         </div>
       ) : (
-        <>
-          <div className="bg-white rounded-2xl border border-ink/10 divide-y divide-ink/5 mb-6">
-            {cart.items.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 p-4">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-ink">
-                    {item.productName}
-                  </p>
-                  <p className="text-xs text-ink/40 font-mono">
-                    ₹{item.price.toFixed(2)} each
-                  </p>
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          <div className="flex-1 w-full space-y-4">
+            <h2 className="text-sm font-bold text-ink/40 uppercase tracking-wider mb-2">Your Items</h2>
+            <div className="space-y-4">
+              {cart.items.map((item) => (
+                <div key={item.id} className="bg-white rounded-[1.5rem] border border-ink/10 p-5 flex flex-col sm:flex-row sm:items-center gap-4 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-ink/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-500"></div>
+                  
+                  <div className="flex-1">
+                    <p className="text-lg font-display font-bold text-ink group-hover:text-cobalt transition-colors">
+                      {item.productName}
+                    </p>
+                    <p className="text-sm text-ink/50 mt-1">
+                      ₹{item.price.toFixed(2)} each
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-6">
+                    <div className="flex items-center border border-ink/10 rounded-xl overflow-hidden bg-paper">
+                      <button
+                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                        className="px-3 py-2 hover:bg-ink/5 text-ink/60 transition-colors"
+                      >
+                        -
+                      </button>
+                      <span className="px-4 py-2 text-sm font-semibold min-w-[2.5rem] text-center bg-white border-x border-ink/5">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="px-3 py-2 hover:bg-ink/5 text-ink/60 transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg font-bold text-ink min-w-[4rem] text-right">
+                        ₹{(item.price * item.quantity).toFixed(2)}
+                      </span>
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl text-ink/30 hover:text-alert hover:bg-alert/10 transition-all"
+                        title="Remove item"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <input
-                  type="number"
-                  min={1}
-                  value={item.quantity}
-                  onChange={(e) =>
-                    updateQuantity(item.id, Number(e.target.value))
-                  }
-                  className="w-16 rounded-lg border border-ink/15 px-2 py-1.5 text-sm text-center"
-                />
-                <span className="text-sm font-semibold text-ink w-20 text-right">
-                  ₹{(item.price * item.quantity).toFixed(2)}
-                </span>
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="text-ink/30 hover:text-alert transition-colors"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between mb-6 px-1">
-            <span className="text-sm font-medium text-ink/60">Total</span>
-            <span className="text-xl font-bold text-ink">
-              ₹{cart.total.toFixed(2)}
-            </span>
-          </div>
-
-          <form
-            onSubmit={handleCheckout}
-            className="bg-white rounded-2xl border border-ink/10 p-6 space-y-4"
-          >
-            <div>
-              <label className="block text-sm font-medium text-ink mb-1.5">
-                Delivery address
-              </label>
-              <textarea
-                required
-                rows={2}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Street, city, state, country"
-                className="w-full rounded-lg border border-ink/15 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-transparent resize-none"
-              />
+              ))}
             </div>
-            {error && <p className="text-sm text-alert">{error}</p>}
-            <button
-              type="submit"
-              disabled={checkingOut}
-              className="w-full rounded-lg bg-ink text-white text-sm font-semibold py-2.5 shadow-md shadow-ink/25 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
-            >
-              {checkingOut
-                ? "Placing order…"
-                : `Checkout — ₹${cart.total.toFixed(2)}`}
-            </button>
-          </form>
-        </>
+          </div>
+
+          <div className="w-full lg:w-80 shrink-0">
+            <h2 className="text-sm font-bold text-ink/40 uppercase tracking-wider mb-2 lg:mb-4">Order Summary</h2>
+            <div className="bg-white rounded-[1.5rem] border border-ink/10 p-6 shadow-sm sticky top-8">
+              <div className="space-y-3 mb-6 pb-6 border-b border-ink/5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-ink/60">Subtotal</span>
+                  <span className="font-semibold text-ink">₹{cart.total.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ink/60">Shipping</span>
+                  <span className="font-semibold text-shipped">Calculated next</span>
+                </div>
+              </div>
+              
+              <div className="flex items-end justify-between mb-8">
+                <span className="text-sm font-bold text-ink/80 uppercase">Total</span>
+                <span className="text-3xl font-display font-bold text-ink text-transparent bg-clip-text bg-gradient-to-br from-ink to-ink/70">
+                  ₹{cart.total.toFixed(2)}
+                </span>
+              </div>
+
+              <form onSubmit={handleCheckout} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-bold text-ink/40 uppercase tracking-wider mb-2">
+                    Delivery address
+                  </label>
+                  <textarea
+                    required
+                    rows={3}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Street, city, state, country..."
+                    className="w-full rounded-xl border border-ink/15 bg-paper px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cobalt focus:border-transparent resize-none transition-shadow"
+                  />
+                </div>
+                {error && (
+                  <div className="p-3 rounded-xl bg-alert/10 text-alert text-xs font-semibold border border-alert/20 flex items-center justify-between">
+                    {error}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  disabled={checkingOut || cart.items.length === 0}
+                  className="relative w-full flex items-center justify-center gap-2 rounded-xl text-sm font-semibold py-3.5 shadow-md shadow-ink/20 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 disabled:shadow-none overflow-hidden bg-ink text-white hover:bg-ink/90"
+                >
+                  {checkingOut ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <ShoppingBag size={18} />
+                      Proceed to Checkout
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
