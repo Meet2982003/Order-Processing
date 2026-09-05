@@ -33,3 +33,5 @@ public class MailService {
     mailSender.send(message);
   }
 }
+
+// psw - zjbz mtgt brrv skco
